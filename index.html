@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payanam — Your City Ride</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Google Fonts: Syne for headings, Outfit for body -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ─── HEADER ──────────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="logo">
+      <span class="logo-icon">🛺</span>
+      <span class="logo-text">Payanam</span>
+    </div>
+    <p class="tagline">ப யணம் · Your City Ride</p>
+  </header>
+
+  <!-- ─── MAIN CONTENT ─────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- SCREEN 1: Booking Form -->
+    <section id="screen-booking" class="screen active">
+      <div class="card booking-card">
+        <h2 class="card-title">Where are you going?</h2>
+        
+        <!-- Route Inputs -->
+        <div class="route-inputs">
+
+          <!-- Pickup Location -->
+          <div class="input-group">
+            <div class="input-icon pickup-dot"></div>
+            <div class="input-field-wrap">
+              <label for="pickup">Pickup Location</label>
+              <input
+                type="text"
+                id="pickup"
+                placeholder="e.g. Chennai Central"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
+          <!-- Vertical connector line -->
+          <div class="route-line"></div>
+
+          <!-- Drop Location -->
+          <div class="input-group">
+            <div class="input-icon drop-dot"></div>
+            <div class="input-field-wrap">
+              <label for="drop">Drop Location</label>
+              <input
+                type="text"
+                id="drop"
+                placeholder="e.g. T. Nagar"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Error message (hidden by default) -->
+        <p id="error-msg" class="error-msg hidden"></p>
+
+        <!-- Fare Estimate Section (shown after fare is fetched) -->
+        <div id="fare-preview" class="fare-preview hidden">
+          <div class="fare-row">
+            <span>📏 Distance</span>
+            <strong id="preview-distance">—</strong>
+          </div>
+          <div class="fare-row">
+            <span>⏱ Estimated Time</span>
+            <strong id="preview-time">—</strong>
+          </div>
+          <div class="fare-row fare-total">
+            <span>💰 Estimated Fare</span>
+            <strong id="preview-fare">—</strong>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="btn-group">
+          <button id="btn-get-fare" class="btn btn-secondary" onclick="getFare()">
+            Get Fare Estimate
+          </button>
+          <button id="btn-book" class="btn btn-primary hidden" onclick="bookRide()">
+            🛺 Book Ride
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Decorative floating chips -->
+      <div class="chips">
+        <span class="chip">⚡ Instant Booking</span>
+        <span class="chip">🔒 Safe Rides</span>
+        <span class="chip">💸 Affordable Fares</span>
+      </div>
+    </section>
+
+
+    <!-- SCREEN 2: Loading / Searching for Driver -->
+    <section id="screen-loading" class="screen">
+      <div class="card loading-card">
+        <div class="loader-ring">
+          <div class="ring"></div>
+          <span class="loader-emoji">🛺</span>
+        </div>
+        <h2>Finding your driver...</h2>
+        <p>We're matching you with the best driver nearby</p>
+        <div class="loading-steps">
+          <div class="step" id="step-1">✅ Ride confirmed</div>
+          <div class="step pulse" id="step-2">🔍 Locating driver...</div>
+          <div class="step dim" id="step-3">📡 Connecting...</div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- SCREEN 3: Ride Confirmed — Driver Details -->
+    <section id="screen-confirmed" class="screen">
+      <div class="card confirmed-card">
+
+        <!-- Status Banner -->
+        <div class="status-banner">
+          <span class="status-dot"></span>
+          <span id="ride-status-text">Driver on the way</span>
+        </div>
+
+        <!-- Booking ID -->
+        <p class="booking-id-label">Booking ID: <strong id="booking-id">—</strong></p>
+
+        <!-- Driver Info -->
+        <div class="driver-card">
+          <div class="driver-avatar" id="driver-avatar">R</div>
+          <div class="driver-info">
+            <h3 id="driver-name">—</h3>
+            <div class="driver-meta">
+              <span class="rating">⭐ <span id="driver-rating">—</span></span>
+              <span class="vehicle" id="driver-vehicle">—</span>
+            </div>
+            <p class="plate" id="driver-plate">—</p>
+          </div>
+        </div>
+
+        <!-- Ride Details -->
+        <div class="ride-details-grid">
+          <div class="detail-box">
+            <p class="detail-label">📍 Pickup</p>
+            <p class="detail-value" id="confirm-pickup">—</p>
+          </div>
+          <div class="detail-box">
+            <p class="detail-label">🏁 Drop</p>
+            <p class="detail-value" id="confirm-drop">—</p>
+          </div>
+          <div class="detail-box">
+            <p class="detail-label">🕐 ETA</p>
+            <p class="detail-value" id="confirm-eta">—</p>
+          </div>
+          <div class="detail-box">
+            <p class="detail-label">💰 Fare</p>
+            <p class="detail-value" id="confirm-fare">—</p>
+          </div>
+        </div>
+
+        <!-- Ride Status Timeline -->
+        <div class="timeline">
+          <div class="timeline-step active" id="tl-booked">
+            <div class="tl-dot"></div>
+            <span>Booked</span>
+          </div>
+          <div class="timeline-connector"></div>
+          <div class="timeline-step" id="tl-onway">
+            <div class="tl-dot"></div>
+            <span>On the way</span>
+          </div>
+          <div class="timeline-connector"></div>
+          <div class="timeline-step" id="tl-completed">
+            <div class="tl-dot"></div>
+            <span>Completed</span>
+          </div>
+        </div>
+
+        <!-- New Ride Button -->
+        <button class="btn btn-outline" onclick="resetApp()">
+          Book Another Ride
+        </button>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── FOOTER ──────────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <p>Made with ❤️ in Chennai · Payanam v1.0</p>
+  </footer>
+
+  <!-- Link the JavaScript file -->
+  <script src="script.js"></script>
+
+</body>
+</html>
